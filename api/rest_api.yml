@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Swagger Petstore - OpenAPI 3.0",
+    "title": "Swagger TravelNet - OpenAPI 3.0",
     "description": "Социальная сеть для путешествий",
     "license": {
       "name": "Apache 2.0",
@@ -27,8 +27,8 @@
       "description": "Everything about reactions"
     },
     {
-      "name": "comment",
-      "description": "Everything about post's vomments"
+      "name": "comments",
+      "description": "Everything about post's comments"
     },
     {
       "name": "places",
@@ -36,14 +36,14 @@
     }
   ],
   "paths": {
-    "/post/create": {
+    "/posts/media": {
       "post": {
         "tags": [
           "post"
         ],
         "summary": "Add a new post",
         "description": "Add a new post",
-        "operationId": "postCreate",
+        "operationId": "loadMedia",
         "requestBody": {
           "description": "Create a new post",
           "content": {
@@ -58,7 +58,21 @@
         "responses": {
           "200": {
             "description": "Successful operation",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "media_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input"
@@ -77,10 +91,93 @@
         ]
       }
     },
-    "/posts/{postId}/comments": {
+    "/posts": {
       "get": {
         "tags": [
           "post"
+        ],
+        "summary": "Lists posts of user's following",
+        "description": "Lists posts of user's following",
+        "operationId": "feed",
+        "parameters": [
+          {
+            "name": "postPtr",
+            "in": "query",
+            "description": "last post id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Post"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Add a new post",
+        "description": "Add a new post",
+        "operationId": "postCreate",
+        "requestBody": {
+          "description": "Create a new post",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "post_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "travel_auth": [
+              "write:pets",
+              "read:pets"
+            ]
+          }
+        ]
+      }
+    },
+    "/comments/{postId}": {
+      "get": {
+        "tags": [
+          "comments"
         ],
         "summary": "Finds post's comments",
         "description": "Finds post's commentd. By default takes last 10 oldest",
@@ -100,6 +197,15 @@
             "in": "query",
             "description": "sort mode - oldest, newest, hot",
             "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "commentPtr",
+            "in": "query",
+            "description": "last comment id",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -134,6 +240,103 @@
             ]
           }
         ]
+      }
+    },
+    "/locations": {
+      "post": {
+        "tags": [
+          "other"
+        ],
+        "summary": "Add a new post",
+        "description": "Add a new location",
+        "operationId": "locationCreate",
+        "requestBody": {
+          "description": "Create a new post",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "location_name": {
+                    "type": "string",
+                    "example": "Какой чудесный пост"
+                  },
+                  "location_coords": {
+                    "$ref": "#/components/schemas/Coords"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "location_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "other"
+        ],
+        "summary": "search for location",
+        "description": "search for location",
+        "operationId": "searhLocation",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "location name",
+            "required": false,
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "locations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Location"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query"
+          },
+          "414": {
+            "description": "Too long query"
+          }
+        }
       }
     },
     "/search": {
@@ -199,23 +402,32 @@
         ]
       }
     },
-    "/reaction/add": {
-      "post": {
+    "/posts/{postId}/reaction": {
+      "put": {
         "tags": [
           "reaction"
         ],
         "summary": "Adds reaction to the post",
         "description": "Adds reaction to the post",
         "operationId": "reactionAdd",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Status values that need to be considered for filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
         "requestBody": {
           "description": "Adds reaction to the post",
           "content": {
             "application/json": {
               "schema": {
                 "properties": {
-                  "post_id": {
-                    "type": "integer"
-                  },
                   "reaction_id": {
                     "type": "integer"
                   }
@@ -245,34 +457,26 @@
             ]
           }
         ]
-      }
-    },
-    "/reaction/remove": {
-      "post": {
+      },
+      "delete": {
         "tags": [
           "reaction"
         ],
         "summary": "Remove reaction from the post",
         "description": "Remove reaction from the post",
         "operationId": "removeReaction",
-        "requestBody": {
-          "description": "Remove reaction from the post",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "post_id": {
-                    "type": "integer"
-                  },
-                  "reaction_id": {
-                    "type": "integer"
-                  }
-                }
-              }
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Status values that need to be considered for filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -292,13 +496,13 @@
         ]
       }
     },
-    "/comment/add": {
+    "/comment": {
       "post": {
         "tags": [
-          "comment"
+          "comments"
         ],
         "summary": "Add new comment to the post",
-        "description": "MAdd new comment to the post",
+        "description": "Add new comment to the post",
         "operationId": "commentAdd",
         "requestBody": {
           "description": "Add new comment to the post",
@@ -321,10 +525,24 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "comment_id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid request body"
+          },
+          "404": {
+            "description": "Post not found"
           }
         },
         "security": [
@@ -337,39 +555,33 @@
         ]
       }
     },
-    "/comment/delete": {
-      "post": {
+    "/comment/{commentId}": {
+      "delete": {
         "tags": [
-          "comment"
+          "comments"
         ],
         "summary": "Remove form from the post",
         "description": "Remove form from the post",
         "operationId": "deleteComment",
-        "requestBody": {
-          "description": "Remove form from the post",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "post_id": {
-                    "type": "integer"
-                  },
-                  "comment_id": {
-                    "type": "integer"
-                  }
-                }
-              }
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "Status values that need to be considered for filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
             "content": {}
           },
-          "400": {
-            "description": "Invalid request body"
+          "404": {
+            "description": "comment not found"
           }
         },
         "security": [
@@ -432,74 +644,26 @@
         }
       }
     },
-    "/user/subscribe": {
-      "post": {
-        "tags": [
-          "user"
-        ],
-        "summary": "subscribe on user's update",
-        "description": "subscribe on user's update",
-        "operationId": "userSubscribe",
-        "requestBody": {
-          "description": "subscribe on user's update",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "user_id": {
-                    "type": "integer"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {}
-          },
-          "400": {
-            "description": "Invalid id"
-          },
-          "409": {
-            "description": "Already subscribed"
-          }
-        },
-        "security": [
-          {
-            "travel_auth": [
-              "write:pets",
-              "read:pets"
-            ]
-          }
-        ]
-      }
-    },
-    "/user/unsubscribe": {
-      "post": {
+    "/user/{username}/subscription": {
+      "delete": {
         "tags": [
           "user"
         ],
         "summary": "unsubscribe from user's updates",
         "description": "unsubscribe from user's updates",
         "operationId": "userUnsubscribe",
-        "requestBody": {
-          "description": "unsubscribe from user's updates",
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "user_id": {
-                    "type": "integer"
-                  }
-                }
-              }
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Status values that need to be considered for filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -517,29 +681,36 @@
             ]
           }
         ]
-      }
-    },
-    "/feed": {
-      "get": {
+      },
+      "put": {
         "tags": [
-          "other"
+          "user"
         ],
-        "summary": "Lists posts of user's following",
-        "description": "Lists posts of user's following",
-        "operationId": "feed",
+        "summary": "subscribe on user's update",
+        "description": "subscribe on user's update",
+        "operationId": "userSubscribe",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "Status values that need to be considered for filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Post"
-                  }
-                }
-              }
-            }
+            "content": {}
+          },
+          "400": {
+            "description": "Invalid id"
+          },
+          "409": {
+            "description": "Already subscribed"
           }
         },
         "security": [
@@ -591,10 +762,10 @@
         }
       }
     },
-    "/user/{username}/posts": {
+    "/posts/{username}": {
       "get": {
         "tags": [
-          "user"
+          "post"
         ],
         "summary": "get users posts",
         "description": "get users posts",
@@ -668,6 +839,31 @@
           },
           "404": {
             "description": "Post not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "post"
+        ],
+        "summary": "Delete user's post by id",
+        "description": "Delete user's post by id",
+        "operationId": "deletePost",
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "postId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {}
           }
         }
       },
@@ -928,18 +1124,12 @@
           "data": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "binary"
+              "type": "string"
             },
-            "description": "Массив изображений для загрузки"
+            "description": "Массив url изображений для загрузки"
           },
-          "location_coords": {
-            "type": "string",
-            "example": "58.56 34.11"
-          },
-          "location_name": {
-            "type": "string",
-            "example": "Santa monica beach"
+          "location_id": {
+            "type": "string"
           }
         }
       },
@@ -948,7 +1138,7 @@
         "properties": {
           "location_name": {
             "type": "string",
-            "example": "Какой чудесный пост"
+            "example": "Чудесная локация"
           },
           "location_coords": {
             "$ref": "#/components/schemas/Coords"
@@ -993,6 +1183,9 @@
       "Comment": {
         "type": "object",
         "properties": {
+          "comment_id": {
+            "type": "integer"
+          },
           "author_nickname": {
             "type": "string"
           },
@@ -1046,7 +1239,7 @@
           "implicit": {
             "authorizationUrl": "https://travel.swagger.io/oauth/authorize",
             "scopes": {
-              "write:pets": "modify pets in your account",
+              "create:posts": "modify pets in your account",
               "read:pets": "read your pets"
             }
           }
