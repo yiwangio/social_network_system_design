@@ -762,7 +762,7 @@
         }
       }
     },
-    "/posts/{username}": {
+    "/posts/users/{username}": {
       "get": {
         "tags": [
           "post"
