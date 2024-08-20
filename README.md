@@ -68,6 +68,20 @@ Traffic(read) =  5.6 GB / sec
 RPS (write) = 10 000 000 / 15 / 86400 = 77
 Traffic = 77 * 800 = 61 MB / sec
 
+capacity = 61 * 86400 * 365 = 1923.696 TB
+63 диска по 32 TB HDD (запись) ? как мастер нода
+для чтения 31 диск SSD по 64 ТБ? (реплика)
+или 250 дисков по 8 TB
+
+writing
+Disks_for_throughput = 61 / 100 = 0.61
+IOPS = 77 / 100 = 0.77
+
+reading
+disks_traffic = 5600 / 500 ~ 12 (SSD)
+iops = 7000 / 1000 ~ 7 (SSD)
+
+
 ### Комменты
 _**Таблица**_
 - id 4б
@@ -82,6 +96,17 @@ Traffic(read) =  1750 * 1.6 = 2.8 MB / sec
 RPS (write) = 10 000 000 / 3 / 86400 = 385
 Traffic = 385 * 1.6 = 0.6 MB / sec
 
+capacity = 0.6 * 86400 * 365 = 19 TB
+writing
+Disks_for_throughput = 0.6 / 100 ~ too low
+IOPS = 385 / 100 ~ 4 
+
+4 диска по 5 TB
+reading 
+Disks_for_throughput = 2.8 / 100 ~ too low
+IOPS = 1750 / 100 ~ 18 
+
+
 
 ### Реакции
 _**Таблица**_
@@ -95,6 +120,17 @@ Traffic(write) = 3472 * 13б = 45 КБ / сек
 
 RPS (READ) = 10 000 000 * 60 / 86400 = 7000
 traffic = 7000 * 13б = 91 КБ / сек
+
+
+capacity = 45 КБ * 86400 * 365 = 1.5 TB
+
+writing 
+Disks_for_throughput = 2.8 / 100 ~ too low
+IOPS = 3472 / 100 ~ 3.5
+
+reading
+Disks_for_throughput = 45 KB / 100 ~ too low
+IOPS = 7000 / 100 ~ 70
 
 
 
