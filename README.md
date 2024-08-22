@@ -58,28 +58,35 @@ _**Таблица**_
 - id 4б
 - user id 4б
 - desc 1600 б
+- location 128b
 - media (макс. 800 КБ)
 
-просмотр
+Общие
 RPS(read) = 10 000 000 * 60 / 86400 = 7000 
-Traffic(read) =  5.6 GB / sec
+RPS(write) = 10 000 000 / 15 / 86400 = 8
 
+**media**
+просмотр
+Traffic(read) =  11.2 GB / sec
 загрузка
-RPS (write) = 10 000 000 / 15 / 86400 = 77
-Traffic = 77 * 800 = 61 MB / sec
+Traffic = 8 * 1600 = 12.3 MB / sec
 
-capacity = 61 * 86400 * 365 = 1923.696 TB
-63 диска по 32 TB HDD (запись) ? как мастер нода
-для чтения 31 диск SSD по 64 ТБ? (реплика)
-или 250 дисков по 8 TB
+capacity = 12.33 * 86400 * 365  = 387.9 TB (400)
+Disks_for_throughput (read) = 11200 / 500 = 23 
+IOPS (write) = 7.7 / 1000 = too low
+IOPS (read) = 7000 / 1000 = 7 (SSD)
 
-writing
-Disks_for_throughput = 61 / 100 = 0.61
-IOPS = 77 / 100 = 0.77
+**описание поста**
+просмотр
+Traffic(read) =  12 MB / sec
+загрузка
+Traffic(write) = 8 * 1650b = 12.7 Kb/sec
 
-reading
-disks_traffic = 5600 / 500 ~ 12 (SSD)
-iops = 7000 / 1000 ~ 7 (SSD)
+capacity = 12.7 * 86400 * 365  = 0.3 TB (500 GB)
+
+Disks_for_throughput (read) = 12 / 500 = too low
+IOPS (write) too low
+IOPS (read) = 7000 / 1000 = 7 SSD or 70 HDD
 
 
 ### Комменты
@@ -96,15 +103,14 @@ Traffic(read) =  1750 * 1.6 = 2.8 MB / sec
 RPS (write) = 10 000 000 / 3 / 86400 = 385
 Traffic = 385 * 1.6 = 0.6 MB / sec
 
-capacity = 0.6 * 86400 * 365 = 19 TB
+capacity = 0.6 * 86400 * 365 = 20 TB
 writing
 Disks_for_throughput = 0.6 / 100 ~ too low
 IOPS = 385 / 100 ~ 4 
 
-4 диска по 5 TB
 reading 
 Disks_for_throughput = 2.8 / 100 ~ too low
-IOPS = 1750 / 100 ~ 18 
+IOPS = 1750 / 100 ~ 18 hdd или 1750 / 500 ~ 4 ssd
 
 
 
@@ -118,19 +124,44 @@ _**Таблица**_
 RPS(write) = 10 000 000 * 30 / 86400 = 3472
 Traffic(write) = 3472 * 13б = 45 КБ / сек
 
-RPS (READ) = 10 000 000 * 60 / 86400 = 7000
-traffic = 7000 * 13б = 91 КБ / сек
-
+RPS (READ) = 10 000 000 * 10 / 86400 = 1150 (просмотр полного списка реакций)
+traffic = 7000 * 13б = 15 КБ / сек
 
 capacity = 45 КБ * 86400 * 365 = 1.5 TB
 
 writing 
-Disks_for_throughput = 2.8 / 100 ~ too low
-IOPS = 3472 / 100 ~ 3.5
+Disks_for_throughput = 2.8 MB / 100 ~ too low
+IOPS = 3472 / 100 ~ 35 или 3472 / 500 ~ 7
 
 reading
 Disks_for_throughput = 45 KB / 100 ~ too low
-IOPS = 7000 / 100 ~ 70
+IOPS = 1150 / 100 ~ 11.5
+
+**Итог**
+Описание постов + комменты + реакции ~ 22 TB
+RPS(READ) = 7000 + 1750 + 1150 ~ 10 000 / sec
+RPS(WRITE) = 8 + 385 + 3472 ~ 4000 / sec
+
+iops reading = 10 000 / 1000 ~ 10 ssd
+iops writing = 4000 / 1000 ~ 4 ssd
+
+traffic (read) ~ 15 Mb / sec
+traffic (write) ~ 0.7 Mb / sec
+
+master
+4x6TB SSD 4000IOPS
+
+Slave 1
+3x8TB SSD 3000IOPS
+
+Slave 2 
+3x8TB SSD 3000IOPS
 
 
+Media
+capacity = 387.9 TB (400)
+Disks_for_throughput (read) = 11200 / 500 = 23 
+IOPS (write) = 7.7 / 1000 = too low
+IOPS (read) = 7000 / 1000 = 7 (SSD)
 
+25x16TB 25k IOPS; 12.5 GB/sec 
